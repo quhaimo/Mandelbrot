@@ -5,7 +5,7 @@
 ComplexPlane::ComplexPlane(int pixelWidth, int pixelHeight) {
 	m_pixel_size = { pixelWidth, pixelHeight };
 	m_aspectRatio = static_cast<double>(pixelHeight) / static_cast<double>(pixelWidth);
-	m_plane_center = { 0.0, 0.0 };
+	m_plane_center = { 0.0f, 0.0f };
 	m_plane_size.x = { BASE_WIDTH, BASE_HEIGHT * m_aspectRatio };
 	m_zoomCount = 0;
 	m_state = sf::State::CALCULATING; //
@@ -89,9 +89,30 @@ void ComplexPlane::loadText(Text& text) {
 //private member functions
 
 size_t ComplexPlane::countIterations(Vector2f coord) {
+	complex<double> z(coord.x, coord.y);
+	size_t i {0};
+	while((z.real() * z.real() + z.imag() + z.imag()) < 4.0 && i < MAX_ITER) {
+        z = z*z + c;
+        i++;
+    }
+	return i;
+}
+	
 }
 
 void ComplexPlane::iterationsToRGB(size_t count, Uint8& r, Uint8& g, Uint8& b) {
+	if (count >= MAX_ITER) {
+		r = 0; 
+		g = 0;
+		b = 0;
+	}
+	else {
+		if (count > 0 && count <= 5) { r = 255 - count * 51; g = 0; b = 255; }
+		else if ( count > 5 && count <= 15 ) { r = 0; g = 0 + count * 25; b = 255; }
+		else if ( count > 15 && count <= 35) { r = 0; g = 255; b = 255 - count * 12; }
+		else if ( count > 35 && count <= 51) { r = 0 + count * 15; g = 255; b = 0; }
+		else if ( count > 51 && count <= 63) { r = 255; g = 255 - count * 21; b = 0; }
+	}
 }
 
 sf::Vector2f ComplexPlane::mapPixelToCoords(Vector2i mousePixel) {
