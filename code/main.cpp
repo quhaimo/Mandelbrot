@@ -34,7 +34,7 @@ int main() {
 				}
 			}
 
-			if (const auto* mouseMoved = event->getIf<Event::MouseButtonPressed>()) {
+			if (const auto* mouseMoved = event->getIf<Event::MouseMoved>()) {
 				mandel.setMouseLocation(sf::Mouse::getPosition(window));
 			}
 		}
